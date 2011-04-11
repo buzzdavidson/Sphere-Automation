@@ -19,6 +19,12 @@ prefixes directly, as well as with lib/site-packages appended.  The
 resulting directories, if they exist, are appended to sys.path, and
 also inspected for path configuration files.
 
+For Debian and derivatives, this sys.path is augmented with directories
+for packages distributed within the distribution. Local addons go
+into /usr/local/lib/python<version>/dist-packages, Debian addons
+install into /usr/{lib,share}/python<version>/dist-packages.
+/usr/lib/python<version>/site-packages is not used.
+
 A path configuration file is a file whose name has the form
 <package>.pth; its contents are additional directories (one per line)
 to be added to sys.path.  Non-existing directories (or
@@ -105,19 +111,6 @@ def removeduppaths():
             known_paths.add(dircase)
     sys.path[:] = L
     return known_paths
-
-# XXX This should not be part of site.py, since it is needed even when
-# using the -S option for Python.  See http://www.python.org/sf/586680
-def addbuilddir():
-    """Append ./build/lib.<platform> in case we're running in the build dir
-    (especially for Guido :-)"""
-    from distutils.util import get_platform
-    s = "build/lib.%s-%.3s" % (get_platform(), sys.version)
-    if hasattr(sys, 'gettotalrefcount'):
-        s += '-pydebug'
-    s = os.path.join(os.path.dirname(sys.path[-1]), s)
-    sys.path.append(s)
-
 
 def _init_pathinfo():
     """Return a set containing all existing directory entries from sys.path"""
@@ -249,6 +242,13 @@ def addusersitepackages(known_paths):
 
     if ENABLE_USER_SITE and os.path.isdir(USER_SITE):
         addsitedir(USER_SITE, known_paths)
+    if ENABLE_USER_SITE:
+        for dist_libdir in ("local/lib", "lib"):
+            user_site = os.path.join(USER_BASE, dist_libdir,
+                                     "python" + sys.version[:3],
+                                     "dist-packages")
+            if os.path.isdir(user_site):
+                addsitedir(user_site, known_paths)
     return known_paths
 
 
@@ -256,12 +256,13 @@ def addsitepackages(known_paths):
     """Add site packages, as determined by zc.buildout.
 
     See original_addsitepackages, below, for the original version."""
-    setuptools_path = '/Users/sdavidson/projects/Sphere-Automation/eggs/setuptools-0.6c12dev_r88795-py2.6.egg'
+    setuptools_path = '/home/steve/projects/Sphere-Automation/eggs/setuptools-0.6c12dev_r88795-py2.6.egg'
     sys.path.append(setuptools_path)
     known_paths.add(os.path.normcase(setuptools_path))
     import pkg_resources
     buildout_paths = [
-        '/Users/sdavidson/projects/Sphere-Automation/eggs/setuptools-0.6c12dev_r88795-py2.6.egg'
+        '/home/steve/projects/Sphere-Automation/eggs/setuptools-0.6c12dev_r88795-py2.6.egg',
+        '/home/steve/projects/Sphere-Automation/eggs/zc.buildout-1.5.2-py2.6.egg'
         ]
     for path in buildout_paths:
         sitedir, sitedircase = makepath(path)
@@ -271,12 +272,21 @@ def addsitepackages(known_paths):
             pkg_resources.working_set.add_entry(sitedir)
     sys.__egginsert = len(buildout_paths) # Support distribute.
     original_paths = [
-        '/Library/Python/2.6/site-packages/pip-0.8.3-py2.6.egg',
-        '/Library/Python/2.6/site-packages/setuptools-0.6c11-py2.6.egg',
-        '/Users/sdavidson/projects/domogik/src',
-        '/Library/Python/2.6/site-packages',
-        '/System/Library/Frameworks/Python.framework/Versions/2.6/Extras/lib/python/PyObjC',
-        '/System/Library/Frameworks/Python.framework/Versions/2.6/Extras/lib/python/wx-2.8-mac-unicode'
+        '/usr/local/lib/python2.6/dist-packages/pyinotify-0.9.1-py2.6.egg',
+        '/usr/local/lib/python2.6/dist-packages/MySQL_python-1.2.3-py2.6-linux-i686.egg',
+        '/usr/local/lib/python2.6/dist-packages/psutil-0.2.1-py2.6-linux-i686.egg',
+        '/usr/local/lib/python2.6/dist-packages/django_pipes-0.2-py2.6.egg',
+        '/usr/local/lib/python2.6/dist-packages/httplib2-0.6.0-py2.6.egg',
+        '/usr/local/lib/python2.6/dist-packages/pyOpenSSL-0.10-py2.6-linux-i686.egg',
+        '/usr/local/lib/python2.6/dist-packages/simplejson-2.1.3-py2.6-linux-i686.egg',
+        '/usr/local/lib/python2.6/dist-packages/SQLAlchemy-0.6.6-py2.6.egg',
+        '/usr/local/lib/python2.6/dist-packages/pip-0.8.3-py2.6.egg',
+        '/home/steve/domogik-hg/domogik/src',
+        '/usr/local/lib/python2.6/dist-packages/Django-1.2-py2.6.egg',
+        '/usr/local/lib/python2.6/dist-packages',
+        '/usr/local/lib/python2.6/dist-packages',
+        '/usr/lib/python2.6/dist-packages',
+        '/usr/lib/pymodules/python2.6'
         ]
     for path in original_paths:
         if path == setuptools_path or path not in known_paths:
@@ -295,14 +305,14 @@ def original_addsitepackages(known_paths):
 
         if sys.platform in ('os2emx', 'riscos'):
             sitedirs.append(os.path.join(prefix, "Lib", "site-packages"))
-        elif sys.platform == 'darwin' and prefix == sys.prefix:
-            sitedirs.append(os.path.join("/Library/Python", sys.version[:3], "site-packages"))
-            sitedirs.append(os.path.join(prefix, "Extras", "lib", "python"))
         elif os.sep == '/':
+            sitedirs.append(os.path.join(prefix, "local/lib",
+                                        "python" + sys.version[:3],
+                                        "dist-packages"))
             sitedirs.append(os.path.join(prefix, "lib",
                                         "python" + sys.version[:3],
-                                        "site-packages"))
-            sitedirs.append(os.path.join(prefix, "lib", "site-python"))
+                                        "dist-packages"))
+            sitedirs.append(os.path.join(prefix, "lib", "dist-python"))
         else:
             sitedirs.append(prefix)
             sitedirs.append(os.path.join(prefix, "lib", "site-packages"))
@@ -506,6 +516,12 @@ def execsitecustomize():
         import sitecustomize
     except ImportError:
         pass
+    except Exception:
+        if sys.flags.verbose:
+            sys.excepthook(*sys.exc_info())
+        else:
+            print >>sys.stderr, \
+                "'import sitecustomize' failed; use -v for traceback"
 
 
 def execusercustomize():
@@ -514,6 +530,12 @@ def execusercustomize():
         import usercustomize
     except ImportError:
         pass
+    except Exception:
+        if sys.flags.verbose:
+            sys.excepthook(*sys.exc_info())
+        else:
+            print>>sys.stderr, \
+                "'import usercustomize' failed; use -v for traceback"
 
 
 def main():
@@ -521,9 +543,6 @@ def main():
 
     abs__file__()
     known_paths = removeduppaths()
-    if (os.name == "posix" and sys.path and
-        os.path.basename(sys.path[-1]) == "Modules"):
-        addbuilddir()
     if ENABLE_USER_SITE is None:
         ENABLE_USER_SITE = check_enableusersite()
     known_paths = addusersitepackages(known_paths)

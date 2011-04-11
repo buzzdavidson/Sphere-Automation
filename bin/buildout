@@ -2,7 +2,7 @@
 
 import sys
 sys.path[0:0] = [
-    '/Users/sdavidson/projects/Sphere-Automation/parts/buildout',
+    '/home/steve/projects/Sphere-Automation/parts/buildout',
     ]
 
 
