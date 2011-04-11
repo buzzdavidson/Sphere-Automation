@@ -6,7 +6,6 @@ setup(
     url = 'http://github.com/buzzdavidson/Sphere-Automation',
     license = 'GPL3',
     description = "Open Home Automation for Linux",
-    long_description = read('README'),
 
     author = 'Steve Davidson',
     author_email = 'steve@sphereautomation.org',
