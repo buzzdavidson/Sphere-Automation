@@ -26,24 +26,24 @@ along with this program.  If not, see U{http://www.gnu.org/licenses/}.
 @organization: Sphere Automation
 """
 from time import time
-from enum import Enum
+from sphere.common.enum import Enum
 
-class CoreEntity():
+class BaseSphereEntity():
     DATA_TYPES = Enum('String','Integer','Float','Boolean','Date','Binary')
     UNKNOWN = '(Unknown)'
-    def __init__(self, name = CoreEntity.UNKNOWN, description = CoreEntity.UNKNOWN, location = CoreEntity.UNKNOWN):
+    def __init__(self, name = BaseSphereEntity.UNKNOWN, description = BaseSphereEntity.UNKNOWN, location = BaseSphereEntity.UNKNOWN):
         self._name = name
         self._location = location
-        self._description = CoreEntity.UNKNOWN
+        self._description = description
 
     name = property(lambda self: self._name)
     location = property(lambda self: self._location)
     description = property(lambda self: self._description)
 
-class Device(CoreEntity):
+class Device(BaseSphereEntity):
     DEVICE_STATUS = Enum('Unknown', 'New', 'Available', 'Missing', 'Error')
     def __init__(self):
-        CoreEntity.__init__(self)
+        BaseSphereEntity.__init__(self)
         self._address = None
         self._configuration = dict()
         self._status = Device.DEVICE_STATUS.Unknown
