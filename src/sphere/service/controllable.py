@@ -55,6 +55,7 @@ class Controllable:
         self._log = LogFactory.getLogger(self, self)
         self._stop = threading.Event()
         self._name = name
+        self._description = None
         self._messenger.subscribe(Messenger.TOPIC_SYSTEM_CONTROL)
         # TODO: subscribe to necessary system topics
 
