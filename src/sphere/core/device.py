@@ -31,13 +31,11 @@ from sphere.common.enum import Enum
 class BaseSphereEntity():
     DATA_TYPES = Enum('String','Integer','Float','Boolean','Date','Binary')
     UNKNOWN = '(Unknown)'
-    def __init__(self, name = BaseSphereEntity.UNKNOWN, description = BaseSphereEntity.UNKNOWN, location = BaseSphereEntity.UNKNOWN):
+    def __init__(self, name = BaseSphereEntity.UNKNOWN, description = BaseSphereEntity.UNKNOWN):
         self._name = name
-        self._location = location
         self._description = description
 
     name = property(lambda self: self._name)
-    location = property(lambda self: self._location)
     description = property(lambda self: self._description)
 
 class Device(BaseSphereEntity):
@@ -49,12 +47,23 @@ class Device(BaseSphereEntity):
         self._status = Device.DEVICE_STATUS.Unknown
         self._lastUpdate = time.time()
         self._devices = list()
-        
+        self._deviceType = None
+
     address = property(lambda self: self._address)
     configuration = property(lambda self: self._configuration)
     status = property(lambda self: self._status)
     lastUpdate = property(lambda self: self._lastUpdate)
     devices = property(lambda self: self._devices)
+    deviceType = property(lambda self: self._deviceType)
+
+class DeviceType(BaseSphereEntity):
+    def __init__(self):
+        BaseSphereEntity.__init__(self)
+        self._deviceCategory = None
+
+    deviceCategory = property(lambda self: self._deviceCategory)
+
+
 
 
 

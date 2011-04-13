@@ -25,8 +25,7 @@ along with this program.  If not, see U{http://www.gnu.org/licenses/}.
 @license: GPL(v3)
 @organization: Sphere Automation
 """
-from core import CoreEntity
-from core import Device
+from sphere.core.device import Device, DeviceType
 
 class ActuatorException(Exception):
     def __init__(self, value):
@@ -37,19 +36,14 @@ class ActuatorException(Exception):
         return repr(self.value)
 
 class Actuator(Device):
-    def __init__(self, actuatorClass = None, sensorClass = None):
-        CoreEntity.__init__(self)
-        self._actuatorClass = actuatorClass
-        self._sensorClass = sensorClass
+    def __init__(self):
+        Device.__init__(self)
+        self._sensorType = sensorClass
 
-class ActuatorType():
-    def __init__(self, name = CoreEntity.UNKNOWN, description = CoreEntity.UNKNOWN, dataType = CoreEntity.DATA_TYPES.String, allowedStates = None):
-        self._name = name
-        self._description = description
-        self._dataType = dataType
-        self._allowedStates = allowedStates
+class ActuatorType(DeviceType):
+    def __init__(self):
+        DeviceType.__init__(self)
+        self._allowedStates = None
+        self._deviceCategory = 'Actuator' # TODO: i18n
 
-    name = property(lambda self: self._name)
-    dataType = property(lambda self: self._dataType)
-    description = property(lambda self: self._description)
     allowedStates = property(lambda self: self._allowedStates)

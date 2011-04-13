@@ -25,7 +25,7 @@ along with this program.  If not, see U{http://www.gnu.org/licenses/}.
 @license: GPL(v3)
 @organization: Sphere Automation
 """
-from sphere.core.core import CoreEntity
+from sphere.core.device import BaseSphereEntity
 
 class BusException(Exception):
     def __init__(self, value):
@@ -36,9 +36,9 @@ class BusException(Exception):
         return repr(self.value)
 
 
-class Bus(CoreEntity):
+class Bus(BaseSphereEntity):
     def __init__(self, name = CoreEntity.UNKNOWN, description = CoreEntity.UNKNOWN):
-        CoreEntity.__init__(self, name, description)
+        BaseSphereEntity.__init__(self, name, description)
         self._devices = list()
 
     def enumerate(self):

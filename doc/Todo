@@ -1,0 +1,5 @@
+- replace enum with http://pypi.python.org/pypi/pyutilib.enum/1.0.4
+- pyutilib.subprocess for process management
+- pyutilib.component.loader
+- pyutilib.component.executable for plugins that wrap external executable
+

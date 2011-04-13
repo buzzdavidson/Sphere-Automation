@@ -25,7 +25,7 @@ along with this program.  If not, see U{http://www.gnu.org/licenses/}.
 @license: GPL(v3)
 @organization: Sphere Automation
 """
-from sphere.core.core import Device, CoreEntity
+from sphere.core.device import Device, DeviceType
 
 class SensorException(Exception):
     def __init__(self, value):
@@ -37,20 +37,18 @@ class SensorException(Exception):
 
 class Sensor(Device):
     def __init__(self, sensorType = None):
-        CoreEntity.__init__(self)
+        Device.__init__(self)
         self._sensorType = sensorType
 
-class SensorType():
+class SensorType(DeviceType):
     def __init__(self, name = CoreEntity.UNKNOWN, description = CoreEntity.UNKNOWN, dataType = CoreEntity.DATA_TYPES.String, units = None):
         self._name = name
         self._description = description
         self._dataType = dataType
         self._units = units
+        self._deviceCategory = 'Sensor' # TODO: i18n
 
-    name = property(lambda self: self._name)
     dataType = property(lambda self: self._dataType)
-    description = property(lambda self: self._description)
     units = property(lambda self: self._units)
 
     # TODO: Unit handling and conversion
-

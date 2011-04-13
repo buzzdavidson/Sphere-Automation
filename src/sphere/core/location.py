@@ -25,11 +25,11 @@ along with this program.  If not, see U{http://www.gnu.org/licenses/}.
 @license: GPL(v3)
 @organization: Sphere Automation
 """
-from sphere import CoreEntity
+from sphere.core.device import BaseSphereEntity
 
-class Site(CoreEntity):
+class Site(BaseSphereEntity):
     def __init__(self):
-        CoreEntity.__init__(self)
+        BaseSphereEntity.__init__(self)
         self._buildings = list()
 
     buildings = property(lambda self: self._buildings)
@@ -42,7 +42,7 @@ class Site(CoreEntity):
 
 class Building(CoreEntity):
     def __init__(self):
-        CoreEntity.__init__(self)
+        BaseSphereEntity.__init__(self)
         self._floors = list()
 
     floors = property(lambda self: self._floors)
@@ -53,9 +53,9 @@ class Building(CoreEntity):
     def removeBuilding(self, floor):
         self._floors.remove(floor)
 
-class Floor(CoreEntity):
+class Floor(BaseSphereEntity):
     def __init__(self):
-        CoreEntity.__init__(self)
+        BaseSphereEntity.__init__(self)
         self._rooms = list()
 
     rooms = property(lambda self: self._rooms)
@@ -66,10 +66,10 @@ class Floor(CoreEntity):
     def removeRoom(self, room):
         self._rooms.remove(room)
 
-class Room(CoreEntity):
+class Room(BaseSphereEntity):
     def __init__(self):
-        CoreEntity.__init__(self)
+        BaseSphereEntity.__init__(self)
 
-class Vehicle(CoreEntity):
+class Vehicle(BaseSphereEntity):
     def __init__(self):
-        CoreEntity.__init__(self)
+        BaseSphereEntity.__init__(self)
