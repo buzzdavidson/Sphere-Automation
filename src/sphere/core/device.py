@@ -57,9 +57,9 @@ class Device(BaseSphereEntity):
     deviceType = property(lambda self: self._deviceType)
 
 class DeviceType(BaseSphereEntity):
-    def __init__(self):
-        BaseSphereEntity.__init__(self)
-        self._deviceCategory = None
+    def __init__(self, deviceCategory=DeviceType.UNKNOWN, name=DeviceType.UNKNOWN, description=DeviceType.UNKNOWN):
+        BaseSphereEntity.__init__(self, name, description)
+        self._deviceCategory = deviceCategory
 
     deviceCategory = property(lambda self: self._deviceCategory)
 

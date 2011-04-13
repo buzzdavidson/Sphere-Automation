@@ -41,9 +41,12 @@ class Actuator(Device):
         self._sensorType = sensorClass
 
 class ActuatorType(DeviceType):
-    def __init__(self):
-        DeviceType.__init__(self)
-        self._allowedStates = None
-        self._deviceCategory = 'Actuator' # TODO: i18n
+    def __init__(self, deviceCategory=DeviceType.UNKNOWN, name=DeviceType.UNKNOWN, description=DeviceType.UNKNOWN, dataType=None, allowedStates=None):
+        DeviceType.__init__(self, deviceCategory, name, description)
+        self._allowedStates = allowedStates
+        self._dataType = dataType
+        if self._deviceCategory is None:
+            self._deviceCategory = 'Actuator' # TODO: i18n
 
     allowedStates = property(lambda self: self._allowedStates)
+    dataType = property(lambda self: self._dataType)

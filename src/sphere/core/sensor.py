@@ -41,12 +41,12 @@ class Sensor(Device):
         self._sensorType = sensorType
 
 class SensorType(DeviceType):
-    def __init__(self, name = CoreEntity.UNKNOWN, description = CoreEntity.UNKNOWN, dataType = CoreEntity.DATA_TYPES.String, units = None):
-        self._name = name
-        self._description = description
+    def __init__(self, deviceCategory=DeviceType.UNKNOWN, name=DeviceType.UNKNOWN, description=DeviceType.UNKNOWN, dataType=None, units=None):
+        DeviceType.__init__(self, deviceCategory, name, description)
         self._dataType = dataType
         self._units = units
-        self._deviceCategory = 'Sensor' # TODO: i18n
+        if self._deviceCategory is None or self._deviceCategory == DeviceType.UNKNOWN:
+            self._deviceCategory = 'Sensor' # TODO: i18n
 
     dataType = property(lambda self: self._dataType)
     units = property(lambda self: self._units)
