@@ -37,7 +37,7 @@ class PluginException(Exception):
 
 class Plugin(Controllable):
     def __init__(self, name):
-        Controllable.__init__(self, self._getName())
+        Controllable.__init__(self, name)
         self._deviceRegistry = None
         self._configuration = None
 
@@ -53,9 +53,6 @@ class Plugin(Controllable):
 #
 #    def _doStop(self):
 #        return True
-
-    def _getName(self):
-        raise PluginException('_getName method must be overridden by implementing class')
 
     def _registerDeviceMetadata(self):
         self._log.debug('Device [%s] does not register device metadata', self._getName())
