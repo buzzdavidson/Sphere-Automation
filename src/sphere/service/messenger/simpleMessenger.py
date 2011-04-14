@@ -42,9 +42,6 @@ class SimpleMessenger(Messenger):
             if tpl <> sender:
                 self._log.debug('Publishing message to recipient [%s]', str(tpl))
                 tpl.messengerCallback(topic, message)
-#            if tpl[0] <> sender:
-#                self._log.debug('Publishing message to recipient [%s]', str(tpl[0]))
-#                tpl[0].messengerCallback(topic, message) # TODO: symantics to exec tpl[1]
 
     def subscribe(self, subscriber, topic, callback=None):
         if not self._topics.has_key(topic):
@@ -60,12 +57,10 @@ class SimpleMessenger(Messenger):
             self._log.debug('Component [%s] is already subscribed to topic [%s]', str(subscriber), topic)
         else:
             self._log.debug('Subscribing component [%s] to topic [%s]', str(subscriber), topic)
-            #self._topics[topic].append(tuple(subscriber, cb))
             self._topics[topic].append(subscriber)
 
     def isSubscribed(self, topic, subscriber, callback=None):
         for tpl in self._topics[topic]:
-#            if tpl[0] == subscriber and (callback is None or tpl[1] == callback):
             if tpl == subscriber:
                 return True
         return False
@@ -80,7 +75,6 @@ class SimpleMessenger(Messenger):
     def unsubscribe(self, subscriber, topic):
         remove = None
         for tpl in self._topics[topic]:
-#            if tpl[0] == subscriber:
             if tpl == subscriber:
                 remove = tpl
                 break
@@ -92,5 +86,4 @@ class SimpleMessenger(Messenger):
         self._log.debug('Removing subscriber %s from all topics', str(subscriber))
         for topic in self._topics.keys():
             self.unsubscribe(subscriber, topic)
-
 
