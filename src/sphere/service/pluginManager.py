@@ -40,13 +40,15 @@ from sphere.service.messenger import Messenger
 from sphere.service.plumberjack import MessengerFactory, LogFactory
 
 class PluginManager(Controllable):
-    def __init__(self):
+    def __init__(self, configManager):
         Controllable.__init__(self, 'Plugin Manager')
+        self._configManager = configManager
         self._pluginPath=None
         self._plugins=dict()
-        self._messenger.subscribe(Messenger.TOPIC_COMPONENT_HEARTBEAT)
+        self._messenger.subscribe(self, Messenger.TOPIC_COMPONENT_HEARTBEAT)
         # TODO: instantiate all plugins in plugin directory, but dont start
         # TODO: MANAGER controls enabled/disabled state: plugin has no idea
+        # TODO: check plugin dependencies before starting or installing plugin
 
     def messengerCallback(self, topic, message):
         pass
@@ -71,5 +73,6 @@ class PluginManager(Controllable):
 
     def controlPlugin(self, plugin, command):
         # command in start, stop, enable, disable
+        # TODO call plugin initializePlugin
         return None
 
