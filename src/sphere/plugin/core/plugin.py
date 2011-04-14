@@ -25,37 +25,45 @@ along with this program.  If not, see U{http://www.gnu.org/licenses/}.
 @license: GPL(v3)
 @organization: Sphere Automation
 """
-from sphere.service.controllable import Controllable
+from sphere.service.controllable import Controllable, ControllableException
 
-class PluginException(Exception):
+class PluginException(ControllableException):
     def __init__(self, value):
-        Exception.__init__(self)
+        ControllableException.__init__(self, value)
         self.value = value
 
     def __str__(self):
         return repr(self.value)
 
 class Plugin(Controllable):
+    '''Basic plugin component'''
+
     def __init__(self, name):
         Controllable.__init__(self, name)
-        self._deviceRegistry = None
+        self._deviceManager = None
         self._configuration = None
+        self._requirements = list()
+        self._version = None
 
-    def initializePlugin(self, deviceRegistry):
-        self._deviceRegistry = deviceRegistry
+    def initializePlugin(self, configManager, deviceManager):
+        '''Called by PluginManager when loaded to allow plugins to load configuration and prepare themselves
+         for execution.  Plugins should not enter a run loop or do any heavy processing during the execution
+         of this method.'''
+        self._deviceManager = deviceManager
         self._registerDeviceMetadata()
+        self._loadConfiguration(configManager)
+        # TODO: assert that properties are set
 
     def messengerCallback(self, topic, message):
         pass
 
-#    def _doStart(self):
-#        return True
-#
-#    def _doStop(self):
-#        return True
-
     def _registerDeviceMetadata(self):
-        self._log.debug('Device [%s] does not register device metadata', self._getName())
+        '''Called by PluginManager when loaded to allow plugins to register any device metadata (bus types,
+        device types, etc) prior to execution.'''
+        self._log.debug('Device [%s] does not register device metadata', self._name)
 
-
+    def _loadConfiguration(self, configManager):
+        '''Called by PluginManager when loaded to allow plugins to load their configuration data from the
+        supplied configManager instance'''
+        self._log.debug('Device [%s] does not load device configuration', self._name)
 
