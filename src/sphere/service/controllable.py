@@ -2,10 +2,6 @@
 # -*- coding: utf-8 -*-
 
 """
-ABC for controllable components (components with start/stop functionality)
-Adds basic features common to these components - lifecycle management,
-logging, and messenger.
-
 This file is part of the B{Sphere Automation} project
 (U{http://www.sphereautomation.org}).
 
@@ -37,6 +33,7 @@ from sphere.service.messenger.messenger import Messenger
 from sphere.service.plumberjack import  messengerFactory, logFactory
 
 class ControllableException(Exception):
+    '''Exception for controllable instances'''
     def __init__(self, value):
         Exception.__init__(self)
         self.value = value
@@ -45,6 +42,10 @@ class ControllableException(Exception):
         return repr(self.value)
 
 class Controllable:
+    '''ABC for controllable components (components with start/stop functionality)
+    Adds basic features common to these components - lifecycle management,
+    logging, and messenger.'''
+
     __metaclass__ = ABCMeta
 
     STATUS = Enum('Unknown','Starting','Started','Stopping','Stopped','Error')

@@ -28,4 +28,5 @@ along with this program.  If not, see U{http://www.gnu.org/licenses/}.
 from abc import ABCMeta, abstractmethod
 
 class Persistence():
+    '''Abstract base class for persistence manager'''
     __metaclass__ = ABCMeta

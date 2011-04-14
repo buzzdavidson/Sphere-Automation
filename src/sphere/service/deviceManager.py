@@ -28,29 +28,38 @@ along with this program.  If not, see U{http://www.gnu.org/licenses/}.
 from sphere.service.controllable import Controllable
 
 class DeviceManager(Controllable):
+    '''DeviceManager is the central registry for devices and device-related metadata.'''
+
     def __init__(self, configManager):
         Controllable.__init__(self, 'Device Registry')
         self._configManager = configManager
 
     def registerDeviceCategory(self, deviceCategory):
+        '''Register a category of devices'''
         pass
 
     def registerDeviceType(self, type):
+        '''Register a new device type'''
         pass
 
     def registerDevice(self, device):
+        '''Register a new device'''
         pass
 
     def getDevicesOfType(self, type):
+        '''Retrieve a list of devices by device type'''
         pass
 
     def getDevicesOfCategory(self, type):
+        '''Retrieve a list of devices by device category'''
         pass
 
     def getDevice(self, id):
+        '''Retrieve device node'''
         pass
 
     def registerBusType(self, type):
+        '''Register a new bus type'''
         pass
 
 

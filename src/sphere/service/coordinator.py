@@ -2,15 +2,6 @@
 # -*- coding: utf-8 -*-
 
 """
-Coordinator
-
-This is the central component of Sphere.
-
-Responsibilities include:
-
-- Global lifecycle support: startup, shutdown, etc
-- Coordination between application components
--
 This file is part of the B{Sphere Automation} project
 (U{http://www.sphereautomation.org}).
 
@@ -47,6 +38,9 @@ from sphere.service.pluginManager import PluginManager
 from sphere.service.plumberjack import LogFactory, MessengerFactory
 
 class SphereCoordinator(Controllable):
+    ''' This is the central component of Sphere.  Responsibilities include Global lifecycle support
+    (startup, shutdown, etc), Coordination between application components
+    '''
     def __init__(self):
         '''Global State Variables - key=varname, value=string'''
         Controllable.__init__(self, 'Coordinator')
@@ -64,7 +58,6 @@ class SphereCoordinator(Controllable):
         self._configManager.start()
         self._deviceRegistry.start()
         self._pluginManager.start()
-
         return self._pluginManager.status == Controllable.STATUS.Started
 
     def _doStop(self):

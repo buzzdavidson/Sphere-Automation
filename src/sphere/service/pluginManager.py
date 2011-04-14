@@ -2,14 +2,6 @@
 # -*- coding: utf-8 -*-
 
 """
-Plugin Manager
-
-Responsibilities include:
-
-- Plugin Lifecycle support (start, stop)
-- Installation support (register, unregister, enable, disable)
-- Plugin status reporting
-
 This file is part of the B{Sphere Automation} project
 (U{http://www.sphereautomation.org}).
 
@@ -40,6 +32,8 @@ from sphere.service.messenger import Messenger
 from sphere.service.plumberjack import MessengerFactory, LogFactory
 
 class PluginManager(Controllable):
+    '''Central plugin manager for Sphere.  Responsibilities include Plugin Lifecycle support (start, stop),
+    Installation support (register, unregister, enable, disable), and Plugin status reporting.'''
     def __init__(self, configManager):
         Controllable.__init__(self, 'Plugin Manager')
         self._configManager = configManager
@@ -60,19 +54,23 @@ class PluginManager(Controllable):
         return True
 
     def getInstalledPlugins(self):
+        '''Retrieve a list of installed plugins'''
         return None
 
     def getAvailablePlugins(self, hideInstalled=False):
+        '''Retrieve a list of available plugins, optionally omitting those already installed.'''
         return None
 
     def installPlugin(self, plugin):
+        '''Install the specified plugin'''
         return None
 
     def uninstallPlugin(self, plugin):
+        '''Uninstall the specified plugin'''
         return None
 
     def controlPlugin(self, plugin, command):
-        # command in start, stop, enable, disable
+        '''command in start, stop, enable, disable'''
         # TODO call plugin initializePlugin
         return None
 
