@@ -1,10 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""
-This package contains core entity types used by Sphere.
-
-This file is part of the B{Sphere Automation} project
+""" This file is part of the B{Sphere Automation} project 
 (U{http://www.sphereautomation.org}).
 
 B{Sphere Automation} - Open Home Automation for Linux

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-This package contains core entity types used by Sphere.
+This package contains plugins related to X10 technologies.
 
 This file is part of the B{Sphere Automation} project
 (U{http://www.sphereautomation.org}).

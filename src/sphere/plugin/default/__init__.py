@@ -1,7 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-""" This file is part of the B{Sphere Automation} project 
+"""
+This package and those contained within it contain plugins which are provided with the Sphere distribution.
+
+This file is part of the B{Sphere Automation} project
 (U{http://www.sphereautomation.org}).
 
 B{Sphere Automation} - Open Home Automation for Linux
