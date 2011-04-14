@@ -39,6 +39,7 @@ along with this program.  If not, see U{http://www.gnu.org/licenses/}.
 import logging
 import threading
 from time import time
+from sphere.service.configManager import ConfigManager
 from sphere.service.controllable import Controllable
 from sphere.service.deviceRegistry import DeviceRegistry
 from sphere.service.messenger import Messenger
@@ -50,8 +51,9 @@ class SphereCoordinator(Controllable):
         '''Global State Variables - key=varname, value=string'''
         Controllable.__init__(self, 'Coordinator')
         self._globalState=dict()
-        self._pluginManager = PluginManager()
-        self._deviceRegistry = DeviceRegistry()
+        self._configManager = ConfigManager()
+        self._pluginManager = PluginManager(self._configManager)
+        self._deviceRegistry = DeviceRegistry(self._configManager)
 
     runLoopInterval = property(lambda self: self._loopInterval)
 
@@ -59,15 +61,12 @@ class SphereCoordinator(Controllable):
         pass
 
     def _doStart(self):
-        # TODO: make start call return status!
-        stat2 = self._deviceRegistry.start()
-        stat1 = self._pluginManager.start()
+        self._configManager.start()
+        self._deviceRegistry.start()
+        self._pluginManager.start()
 
-        return self._pluginManager.getStatus() == Controllable.STATUS.Started
+        return self._pluginManager.status == Controllable.STATUS.Started
 
     def _doStop(self):
+        # TODO: stop all children
         pass
-
-    def _getName(self):
-        return 'Sphere Coordinator'
-    
