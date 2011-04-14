@@ -34,6 +34,7 @@ from sphere.service.configManager import ConfigManager
 from sphere.service.controllable import Controllable
 from sphere.service.deviceRegistry import DeviceRegistry
 from sphere.service.messenger import Messenger
+from sphere.service.messenger.simpleMessenger import SimpleMessenger
 from sphere.service.pluginManager import PluginManager
 from sphere.service.plumberjack import LogFactory, MessengerFactory
 
@@ -44,6 +45,7 @@ class SphereCoordinator(Controllable):
     def __init__(self):
         '''Global State Variables - key=varname, value=string'''
         Controllable.__init__(self, 'Coordinator')
+        MessengerFactory._messenger = SimpleMessenger() # TODO: configure this properly (directly in plumberjack)
         self._globalState=dict()
         self._configManager = ConfigManager()
         self._pluginManager = PluginManager(self._configManager)
