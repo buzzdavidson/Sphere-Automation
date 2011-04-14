@@ -31,6 +31,16 @@ along with this program.  If not, see U{http://www.gnu.org/licenses/}.
 """
 from abc import ABCMeta, abstractmethod
 
+class MessengerException(Exception):
+    def __init__(self, value, topic=None):
+        Exception.__init__(self)
+        self.value = value
+        self.topic = topic
+
+    def __str__(self):
+        return repr(self.value)
+
+
 class Messenger():
     __metaclass__ = ABCMeta
     TOPIC_SYSTEM = 'system'
@@ -41,11 +51,27 @@ class Messenger():
     # implementations look for: def messengerCallback(self, topic, message):
 
     @abstractmethod
-    def publish(self, topic, message):
+    def publish(self, sender, topic, message):
         pass
 
     @abstractmethod
-    def subscribe(self, topic, callback=None):
+    def subscribe(self, subscriber, topic, callback=None):
         pass
 
-    
+    @abstractmethod
+    def registerTopic(self, topic):
+        pass
+
+    @abstractmethod
+    def getTopics(self):
+        pass
+
+    @abstractmethod
+    def unsubscribe(self, subscriber, topic):
+        pass
+
+    @abstractmethod
+    def removeSubscriber(self, subscriber):
+        pass
+
+
