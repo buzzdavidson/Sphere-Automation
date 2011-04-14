@@ -4,7 +4,7 @@
 """
 ABC for controllable components (components with start/stop functionality)
 Adds basic features common to these components - lifecycle management,
-logging, and messenger
+logging, and messenger.
 
 This file is part of the B{Sphere Automation} project
 (U{http://www.sphereautomation.org}).
@@ -33,8 +33,8 @@ along with this program.  If not, see U{http://www.gnu.org/licenses/}.
 from abc import ABCMeta, abstractmethod
 import threading
 from sphere.common.enum import Enum
-from sphere.service.messenger import Messenger
-from sphere.service.plumberjack import MessengerFactory, LogFactory
+from sphere.service.messenger.messenger import Messenger
+from sphere.service.plumberjack import  messengerFactory, logFactory
 
 class ControllableException(Exception):
     def __init__(self, value):
@@ -50,14 +50,16 @@ class Controllable:
     STATUS = Enum('Unknown','Starting','Started','Stopping','Stopped','Error')
 
     def __init__(self, name):
-        self._status = Controllable.STATUS.Unknown
-        self._messenger = MessengerFactory.getMessenger(self, self)
-        self._log = LogFactory.getLogger(self, self)
-        self._stop = threading.Event()
         self._name = name
         self._description = None
-        self._messenger.subscribe(Messenger.TOPIC_SYSTEM_CONTROL)
-        # TODO: subscribe to necessary system topics
+        self._status = Controllable.STATUS.Unknown
+        self._messenger = messengerFactory.getMessenger(self)
+        self._log = logFactory.getLogger(self)
+        self._stop = threading.Event()
+
+    name = property(lambda self: self._name)
+    description = property(lambda self: self._description)
+    status = property(lambda self: self._status)
 
     @abstractmethod
     def _doStart(self):
@@ -73,16 +75,18 @@ class Controllable:
         if self._status in (Controllable.STATUS.Unknown,Controllable.STATUS.Stopped,Controllable.STATUS.Error):
             self._setStatus(Controllable.STATUS.Starting)
             try:
-                self._log.debug("Starting component [%s]...", self._name())
+                self._log.debug("Starting component [%s]...", self._name)
                 self._stop.clear()
                 stat = self._doStart()
                 if stat:
-                    self._log.debug("Component [%s] started.", self._name())
+                    self._log.debug("Component [%s] started.", self._name)
                 else:
-                    self._log.warning("Unable to start component [%s]!", self._name())
+                    self._log.warning("Unable to start component [%s]!", self._name)
+                # TODO: subscribe to messenger if started successfully
                 newStatus = Controllable.STATUS.Started if stat else Controllable.STATUS.Stopped
                 self._setStatus(newStatus)
-            except ControllableException as ex:
+            except Exception as ex:
+                # TODO: should this exception be surfaced?
                 self._setStatus(Controllable.STATUS.Error)
                 self._log.error("Exception at startup: %s", ex)
 
@@ -100,23 +104,23 @@ class Controllable:
         if self._status == Controllable.STATUS.Started:
             self._setStatus(Controllable.STATUS.Stopping)
             try:
-                self._log.debug("Stopping component [%s]...", self._name())
+                self._log.debug("Stopping component [%s]...", self._name)
                 self._stop.set()
                 stat = self._doStop()
                 if stat:
-                    self._log.debug("Component [%s] stopped.", self._name())
+                    self._log.debug("Component [%s] stopped.", self._name)
                 else:
-                    self._log.warning("Unable to stop component [%s]", self._name())
+                    self._log.warning("Unable to stop component [%s]", self._name)
+                # TODO: unsubscribe all if stopped
                 newStatus = Controllable.STATUS.Stopped if stat else Controllable.STATUS.Started
                 self._setStatus(newStatus)
-            except ControllableException as ex:
+            except Exception as ex:
+                # TODO: should this exception be surfaced?
+                # TODO: this could leave background thread in inconsistent state
                 self._setStatus(Controllable.STATUS.Error)
                 self._log.error("Exception at stop: %s", ex)
-
-    def getStatus(self):
-        return self._status
 
     def _setStatus(self, status):
         if status <> self._status:
             self._status = status
-            self._messenger.publish(TOPIC_COMPONENT_STATUS, status)
+            self._messenger.publish(self, Messenger.TOPIC_COMPONENT_STATUS, status)
