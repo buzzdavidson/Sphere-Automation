@@ -1,0 +1,4 @@
+The Sphere Automation project is now using some new hosted services for project management!
+
+New source hosting via Beanstalk: https://sphereautomation.beanstalkapp.com/
+Bug tracking and agile management via Lighthouse: http://sphereautomation.lighthouseapp.com/projects/74530-sphere-automation/overview
