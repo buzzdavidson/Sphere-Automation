@@ -54,6 +54,16 @@ class SimpleMessengerTests(unittest.TestCase):
         except Exception:
             self.fail('expected MessengerException')
 
+    def testSubscribe_unknownTopic(self):
+        try:
+            receiver = mock.Mock()
+            self.target.subscribe(receiver, self.TOPIC2)
+            self.fail('expected exception')
+        except MessengerException:
+            pass # this is expected
+        except Exception:
+            self.fail('expected MessengerException')
+
     def testPublish_knownTopic(self):
         self.target.registerTopic(self.TOPIC)
         receiver = mock.Mock()
@@ -139,10 +149,6 @@ class SimpleMessengerTests(unittest.TestCase):
         self.assertFalse(self.target.isSubscribed(self.TOPIC2, receiver1))
         self.assertTrue(self.target.isSubscribed(self.TOPIC, receiver2))
         self.assertTrue(self.target.isSubscribed(self.TOPIC2, receiver2))
-
-
-
-
 
 if __name__ == '__main__':
     unittest.main()
