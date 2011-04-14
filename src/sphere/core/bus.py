@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-""" This file is part of the B{Sphere Automation} project 
+"""
+This file is part of the B{Sphere Automation} project
 (U{http://www.sphereautomation.org}).
 
 B{Sphere Automation} - Open Home Automation for Linux
@@ -37,12 +38,22 @@ class BusException(Exception):
 
 
 class Bus(BaseSphereEntity):
+    '''Represents a device bus within Sphere.  A device bus groups devices from a related technology, such as
+    X10 devices.  A bus may optionally support device discovery.  A Bus will contain zero or more devices.'''
+
     def __init__(self, name = CoreEntity.UNKNOWN, description = CoreEntity.UNKNOWN):
         BaseSphereEntity.__init__(self, name, description)
         self._devices = list()
+        self._busType = busType
 
     def enumerate(self):
         raise BusException("Must be overridden in implementing class")
+
+class BusType(BaseSphereEntity):
+    '''Represents a type of device bus within Sphere.'''
+    def __init__(self, name=BusType.UNKNOWN, description=BusType.UNKNOWN):
+        BaseSphereEntity.__init__(self, name, description)
+
 
 
 
