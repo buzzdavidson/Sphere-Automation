@@ -27,9 +27,10 @@ along with this program.  If not, see U{http://www.gnu.org/licenses/}.
 """
 from sphere.service.controllable import Controllable
 
-class DeviceRegistry(Controllable):
-    def __init__(self):
+class DeviceManager(Controllable):
+    def __init__(self, configManager):
         Controllable.__init__(self, 'Device Registry')
+        self._configManager = configManager
 
     def registerDeviceCategory(self, deviceCategory):
         pass
@@ -47,6 +48,9 @@ class DeviceRegistry(Controllable):
         pass
 
     def getDevice(self, id):
+        pass
+
+    def registerBusType(self, type):
         pass
 
 
