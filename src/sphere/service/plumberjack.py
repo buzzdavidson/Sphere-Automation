@@ -34,24 +34,43 @@ import logging
 class LogFactory():
     DEFAULT_LOGGER = 'Sphere'
     def __init__(self):
-        # TODO initialize logger
-        pass
+        #log = logging.getLogger()
+        #log = logging.getLogger(LogFactory.DEFAULT_LOGGER)
+        #hdlr = logging.FileHandler('log.csv')
+        #formatter = logging.Formatter(FORMAT)
+        #hdlr.setFormatter(formatter)
+        #log.addHandler(hdlr)
+        #log.setLevel(logging.DEBUG) #set verbosity to show all messages of severity >= DEBUG
+        FORMAT='%(asctime)s\t%(levelname)s\t%(message)s'
+        logging.basicConfig(level=logging.DEBUG, format=FORMAT) # log sur console
 
-    def getLogger(self, caller):
+    def getLogger(self, caller=None):
         if caller is None:
             return logging.getLogger(LogFactory.DEFAULT_LOGGER)
         if isinstance(caller, str):
             return logging.getLogger(caller)
-        return logging.getLogger(type(caller))
+        callerName = str(type(caller))
+        return logging.getLogger(callerName)
 
 class MessengerFactory():
     def __init__(self):
-        # TODO initialize messenger
+        self._messenger = None
         pass
 
     def getMessenger(self, caller):
         # TODO: implement getMessenger
         # Method creates appropriate messenger instance and subscribes to default topics automatically
+        return self._messenger
+
+class PersistenceFactory():
+    def __init__(self):
+        # TODO initialize persistence
+        pass
+
+    def getPersistenceManager(self):
+        # TODO: implement getPersistenceManager
         return None
 
-
+logFactory = LogFactory()
+messengerFactory = MessengerFactory()
+persistenceFactory = PersistenceFactory()
