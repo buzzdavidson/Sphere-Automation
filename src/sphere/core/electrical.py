@@ -31,10 +31,13 @@ from sphere.core.bus import Bus
 from sphere.core.device import BaseSphereEntity, Device
 
 class Circuit(Bus):
+    '''A Simple Device Bus representing a household electrical circuit.  May be useful for modeling the electrical system
+    within a house, in order to catalog the devices (outlets, lights, switches, etc) on a single circuit breaker.'''
     def __init__(self):
         Bus.__init__(self)
 
 class ElectricalDevice(Device):
+    '''Represents a single household electrical device, such as an outlet, a circuit breaker, or a light.'''
     def __init__(self):
         Device.__init__(self)
         self._deviceType = "Electrical"

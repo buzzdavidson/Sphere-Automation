@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-""" This file is part of the B{Sphere Automation} project 
+"""
+This file is part of the B{Sphere Automation} project
 (U{http://www.sphereautomation.org}).
 
 B{Sphere Automation} - Open Home Automation for Linux
@@ -36,6 +37,11 @@ class SensorException(Exception):
         return repr(self.value)
 
 class Sensor(Device):
+    '''Represents a single Sensor device within Sphere.  A Sensor is a device which measures a property of the
+environment, such as a thermometer.  Sensors within Sphere are fine-grained objects; a device which
+measures several properties (such as temperature and humidity) would be modeled as a device with two
+independent sensors.'''
+
     def __init__(self, sensorType = None):
         Device.__init__(self)
         self._sensorType = sensorType

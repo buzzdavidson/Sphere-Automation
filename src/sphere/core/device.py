@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-""" This file is part of the B{Sphere Automation} project 
+"""
+This file is part of the B{Sphere Automation} project
 (U{http://www.sphereautomation.org}).
 
 B{Sphere Automation} - Open Home Automation for Linux
@@ -29,6 +30,7 @@ from time import time
 from sphere.common.enum import Enum
 
 class BaseSphereEntity():
+    '''Base class for entities within Sphere'''
     DATA_TYPES = Enum('String','Integer','Float','Boolean','Date','Binary')
     UNKNOWN = '(Unknown)'
     def __init__(self, name = BaseSphereEntity.UNKNOWN, description = BaseSphereEntity.UNKNOWN):
@@ -39,6 +41,11 @@ class BaseSphereEntity():
     description = property(lambda self: self._description)
 
 class Device(BaseSphereEntity):
+    '''Represents a single Device within Sphere.  A Device can represent nearly anything, from a physical item like a
+    switch or a light to a virtual state machine.  Devices within Sphere are typically contained within a Device Bus.
+    Devices can be represented as nested items - devices can contain other devices.  For example, a single device
+    representing a relay board may contain several nested sensor and actuator devices, each representing a single
+    controllable or readable resource.'''
     DEVICE_STATUS = Enum('Unknown', 'New', 'Available', 'Missing', 'Error')
     def __init__(self):
         BaseSphereEntity.__init__(self)
@@ -57,16 +64,12 @@ class Device(BaseSphereEntity):
     deviceType = property(lambda self: self._deviceType)
 
 class DeviceType(BaseSphereEntity):
-    def __init__(self, deviceCategory=DeviceType.UNKNOWN, name=DeviceType.UNKNOWN, description=DeviceType.UNKNOWN):
+    '''Represents a single type or class of device within Sphere.'''
+    def __init__(self, deviceCategory=DeviceType.UNKNOWN, name=DeviceType.UNKNOWN, description=DeviceType.UNKNOWN, busType=DeviceType.UNKNOWN):
         BaseSphereEntity.__init__(self, name, description)
         self._deviceCategory = deviceCategory
+        self._busType = busType
 
     deviceCategory = property(lambda self: self._deviceCategory)
-
-
-
-
-
-    
-    
+    busType = property(lambda self: self._busType)
 
