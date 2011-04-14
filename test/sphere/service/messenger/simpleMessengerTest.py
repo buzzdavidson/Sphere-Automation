@@ -30,16 +30,119 @@ import unittest
 from sphere.service.controllable import Controllable
 import mock
 from mock import patch
+from sphere.service.messenger.messenger import MessengerException
 from sphere.service.messenger.simpleMessenger import SimpleMessenger
 from sphere.service.plumberjack import messengerFactory
 
 class SimpleMessengerTests(unittest.TestCase):
-    def testRegisterTopic(self):
-        self.target.registerTopic('a')
-        self.assertTrue('a' in self.target.getTopics())
-
     def setUp(self):
         self.target = SimpleMessenger()
+        self.TOPIC = 'a'
+        self.TOPIC2 = 'b'
+        self.MESSAGE = 'This is a test'
+
+    def testRegisterTopic(self):
+        self.target.registerTopic(self.TOPIC)
+        self.assertTrue(self.TOPIC in self.target.getTopics())
+
+    def testPublish_unknownTopic(self):
+        try:
+            self.target.publish(self, self.TOPIC2, self.MESSAGE)
+            self.fail('expected exception')
+        except MessengerException:
+            pass # this is expected
+        except Exception:
+            self.fail('expected MessengerException')
+
+    def testPublish_knownTopic(self):
+        self.target.registerTopic(self.TOPIC)
+        receiver = mock.Mock()
+        receiver.messengerCallback = mock.Mock()
+        self.target.subscribe(receiver, self.TOPIC)
+        self.target.publish(self, self.TOPIC, self.MESSAGE)
+        receiver.messengerCallback.assert_called_once_with(self.TOPIC, self.MESSAGE)
+
+    def testPublish_knownTopic_multiRecipients(self):
+        self.target.registerTopic(self.TOPIC)
+        self.target.registerTopic(self.TOPIC2)
+        receiver1 = mock.Mock()
+        receiver1.messengerCallback = mock.Mock()
+        receiver2 = mock.Mock()
+        receiver2.messengerCallback = mock.Mock()
+        receiver3 = mock.Mock()
+        receiver3.messengerCallback = mock.Mock()
+        self.target.subscribe(receiver1, self.TOPIC)
+        self.target.subscribe(receiver2, self.TOPIC2)
+        self.target.subscribe(receiver3, self.TOPIC)
+        self.target.publish(self, self.TOPIC, self.MESSAGE)
+        receiver1.messengerCallback.assert_called_once_with(self.TOPIC, self.MESSAGE)
+        self.assertFalse(receiver2.messengerCallback.called)
+        receiver3.messengerCallback.assert_called_once_with(self.TOPIC, self.MESSAGE)
+
+    def testPublish_knownTopic_multiRecipients_senderNotIncluded(self):
+        self.target.registerTopic(self.TOPIC)
+        self.target.registerTopic(self.TOPIC2)
+        receiver1 = mock.Mock()
+        receiver1.messengerCallback = mock.Mock()
+        receiver2 = mock.Mock()
+        receiver2.messengerCallback = mock.Mock()
+        receiver3 = mock.Mock()
+        receiver3.messengerCallback = mock.Mock()
+        self.target.subscribe(receiver1, self.TOPIC)
+        self.target.subscribe(receiver2, self.TOPIC2)
+        self.target.subscribe(receiver3, self.TOPIC)
+        self.target.publish(receiver1, self.TOPIC, self.MESSAGE)
+        self.assertFalse(receiver1.messengerCallback.called)
+        self.assertFalse(receiver2.messengerCallback.called)
+        receiver3.messengerCallback.assert_called_once_with(self.TOPIC, self.MESSAGE)
+
+    def testSubscribe(self):
+        self.target.registerTopic(self.TOPIC)
+        self.target.registerTopic(self.TOPIC2)
+        receiver1 = mock.Mock()
+        self.target.subscribe(receiver1, self.TOPIC)
+        self.target.subscribe(receiver1, self.TOPIC2)
+        self.assertTrue(self.target.isSubscribed(self.TOPIC, receiver1))
+        self.assertTrue(self.target.isSubscribed(self.TOPIC2, receiver1))
+
+    def testUnsubscribe(self):
+        self.target.registerTopic(self.TOPIC)
+        self.target.registerTopic(self.TOPIC2)
+        receiver1 = mock.Mock()
+        self.target.subscribe(receiver1, self.TOPIC)
+        self.target.subscribe(receiver1, self.TOPIC2)
+        self.target.unsubscribe(receiver1, self.TOPIC)
+        self.assertFalse(self.target.isSubscribed(self.TOPIC, receiver1))
+        self.assertTrue(self.target.isSubscribed(self.TOPIC2, receiver1))
+
+    def testRemoveSubscriber(self):
+        self.target.registerTopic(self.TOPIC)
+        self.target.registerTopic(self.TOPIC2)
+        receiver1 = mock.Mock()
+        self.target.subscribe(receiver1, self.TOPIC)
+        self.target.subscribe(receiver1, self.TOPIC2)
+        self.target.removeSubscriber(receiver1)
+        self.assertFalse(self.target.isSubscribed(self.TOPIC, receiver1))
+        self.assertFalse(self.target.isSubscribed(self.TOPIC2, receiver1))
+
+    def testRemoveSubscriber_multi(self):
+        self.target.registerTopic(self.TOPIC)
+        self.target.registerTopic(self.TOPIC2)
+        receiver1 = mock.Mock()
+        receiver2 = mock.Mock()
+        self.target.subscribe(receiver1, self.TOPIC)
+        self.target.subscribe(receiver1, self.TOPIC2)
+        self.target.subscribe(receiver2, self.TOPIC)
+        self.target.subscribe(receiver2, self.TOPIC2)
+        self.target.removeSubscriber(receiver1)
+        self.assertFalse(self.target.isSubscribed(self.TOPIC, receiver1))
+        self.assertFalse(self.target.isSubscribed(self.TOPIC2, receiver1))
+        self.assertTrue(self.target.isSubscribed(self.TOPIC, receiver2))
+        self.assertTrue(self.target.isSubscribed(self.TOPIC2, receiver2))
+
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
