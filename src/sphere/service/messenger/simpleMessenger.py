@@ -35,16 +35,19 @@ class SimpleMessenger(Messenger):
         self._log = logFactory.getLogger('SimpleMessenger')
 
     def publish(self, sender, topic, message):
-        if not dict.has_key(topic):
+        if not self._topics.has_key(topic):
             raise MessengerException('Unknown topic ' + topic, topic)
         self._log.debug('Publishing message [%s] to topic [%s]', message, topic)
         for tpl in self._topics[topic]:
-            if tpl[0] <> sender:
-                self._log.debug('Publishing message to recipient [%s]', str(tpl[0]))
-                tpl[0].messengerCallback(topic, message) # TODO: symantics to exec tpl[1]
+            if tpl <> sender:
+                self._log.debug('Publishing message to recipient [%s]', str(tpl))
+                tpl.messengerCallback(topic, message)
+#            if tpl[0] <> sender:
+#                self._log.debug('Publishing message to recipient [%s]', str(tpl[0]))
+#                tpl[0].messengerCallback(topic, message) # TODO: symantics to exec tpl[1]
 
     def subscribe(self, subscriber, topic, callback=None):
-        if not dict.has_key(topic):
+        if not self._topics.has_key(topic):
             raise MessengerException('Unknown topic ' + topic, topic)
         cb = callback
         if cb is None:
@@ -53,15 +56,17 @@ class SimpleMessenger(Messenger):
             else:
                 cb = subscriber.messengerCallback
 
-        if isSubscribed(topic, subscriber, cb):
+        if self.isSubscribed(topic, subscriber, cb):
             self._log.debug('Component [%s] is already subscribed to topic [%s]', str(subscriber), topic)
         else:
             self._log.debug('Subscribing component [%s] to topic [%s]', str(subscriber), topic)
-            self._topics[topic].append(tuple(subscriber, cb))
+            #self._topics[topic].append(tuple(subscriber, cb))
+            self._topics[topic].append(subscriber)
 
     def isSubscribed(self, topic, subscriber, callback=None):
         for tpl in self._topics[topic]:
-            if tpl[0] == subscriber and (callback is None or tpl[1] == callback):
+#            if tpl[0] == subscriber and (callback is None or tpl[1] == callback):
+            if tpl == subscriber:
                 return True
         return False
 
@@ -75,7 +80,8 @@ class SimpleMessenger(Messenger):
     def unsubscribe(self, subscriber, topic):
         remove = None
         for tpl in self._topics[topic]:
-            if tpl[0] == subscriber:
+#            if tpl[0] == subscriber:
+            if tpl == subscriber:
                 remove = tpl
                 break
         if remove is not None:
@@ -85,5 +91,6 @@ class SimpleMessenger(Messenger):
     def removeSubscriber(self, subscriber):
         self._log.debug('Removing subscriber %s from all topics', str(subscriber))
         for topic in self._topics.keys():
-            unsubscribe(subscriber, topic)
+            self.unsubscribe(subscriber, topic)
+
 
