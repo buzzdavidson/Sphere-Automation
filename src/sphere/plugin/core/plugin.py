@@ -51,6 +51,7 @@ class Plugin(Controllable):
          of this method.'''
         self._deviceManager = deviceManager
         self._registerDeviceMetadata()
+        self._registerDevices()
         self._loadConfiguration(configManager)
         # TODO: assert that properties are set
 
@@ -62,8 +63,14 @@ class Plugin(Controllable):
         device types, etc) prior to execution.'''
         self._log.debug('Device [%s] does not register device metadata', self._name)
 
+    def _registerDevices(self):
+        '''Called by PluginManager when loaded to allow plugins to register any found devices'''
+        self._log.debug('Device [%s] does not register devices', self._name)
+
     def _loadConfiguration(self, configManager):
         '''Called by PluginManager when loaded to allow plugins to load their configuration data from the
         supplied configManager instance'''
         self._log.debug('Device [%s] does not load device configuration', self._name)
 
+    def _notify(self, message):
+        self._messenger.publish(self, message.topic, message)
