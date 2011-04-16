@@ -44,6 +44,9 @@ class SampleControllable(Controllable):
     def _doStop(self):
         return self.stopReturn
 
+    def _doRefresh(self):
+        pass
+
 class ControllableTests(unittest.TestCase):
     def setUp(self):
         self.mockMessenger = mock.Mock()
