@@ -35,12 +35,6 @@ class CoreDevices(Plugin):
         Plugin.__init__(self, 'CoreDevices')
         self._description = 'Common elements required for all devices'
 
-    def _doStart(self):
-        return True
-
-    def _doStop(self):
-        return True
-
     def _registerDeviceMetadata(self):
         self._deviceManager.registerDeviceCategory('Sensor')
         self._deviceManager.registerDeviceCategory('Actuator')

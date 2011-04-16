@@ -74,3 +74,14 @@ class Plugin(Controllable):
 
     def _notify(self, message):
         self._messenger.publish(self, message.topic, message)
+
+    def _doStart(self):
+        self._log.debug('Device [%s] does not implement _doStart', self._name)
+        return True
+
+    def _doStop(self):
+        self._log.debug('Device [%s] does not implement _doStop', self._name)
+        return True
+
+    def _doRefresh(self):
+        self._log.debug('Device [%s] does not implement _doRefresh', self._name)

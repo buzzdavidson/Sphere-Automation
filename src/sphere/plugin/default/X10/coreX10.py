@@ -34,11 +34,5 @@ class CoreX10(Plugin):
         self._description = 'Common elements required for all X10 devices'
         self._version = '0.1.0'
 
-    def _doStart(self):
-        return True
-
-    def _doStop(self):
-        return True
-
     def _registerDeviceMetadata(self):
         self._deviceManager.registerBusType(BusType('X10', 'X10 Power Line and RF Bus'))
