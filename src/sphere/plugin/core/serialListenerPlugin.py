@@ -25,11 +25,35 @@ along with this program.  If not, see U{http://www.gnu.org/licenses/}.
 @license: GPL(v3)
 @organization: Sphere Automation
 """
-from sphere.plugin.core.serialBasePlugin import SerialBasePlugin
+from time import time
+from sphere.plugin.core.serialBasePlugin import SerialBasePlugin, SerialPluginException, BasicSerialHandler
 
 class SerialListenerPlugin(SerialBasePlugin):
     '''Starting point for serial plugins which simply listen to messages coming from an underlying serial device.
     Provides a mechanism for the automatic removal of duplicate messages occurring within a specified timeframe.'''
-    def __init__(self, name, device=None):
-        SerialBasePlugin.__init__(name, device)
+    def __init__(self, name):
+        SerialBasePlugin.__init__(self, name)
+        self._duplicateMessageThreshold = 5
 
+    def _getHandler(self, serialPort):
+        return DedupeSerialHandler(self._serialPort, self._log, self._deviceCallback, self._messageLength, self._duplicateMessageThreshold)
+
+class DedupeSerialHandler(BasicSerialHandler):
+    def __init__(self, serialPort, log, messageCallback, messageLength, duplicateThreshold):
+       BasicSerialHandler.__init__(self, serialPort, log, messageCallback, messageLength)
+       self._dedupe = dict()
+       self._duplicateMessageThreshold = duplicateThreshold
+
+    def _messageHook(self, message):
+        if self._duplicateMessageThreshold is not None:
+            key = str(message).encode('hex')
+            # TODO: max message length: how many bytes to define duplicate?
+            # TODO: data aging - purge old data
+            if self._dedupe.has_key(key):
+                last = self._dedupe[key]
+                delta = time.time() - last
+                if delta < self._duplicateMessageThreshold:
+                    self._log.debug('Discarding duplicate message (%s, age=%4.2f)' % (key, delta))
+                    return None
+            self._dedupe[key] = time.time()
+        return message
