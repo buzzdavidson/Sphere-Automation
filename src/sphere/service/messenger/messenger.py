@@ -27,6 +27,9 @@ along with this program.  If not, see U{http://www.gnu.org/licenses/}.
 @organization: Sphere Automation
 """
 from abc import ABCMeta, abstractmethod
+import collections
+import time
+from sphere.common.enum import Enum
 
 class MessengerException(Exception):
     '''Base exception for messsenger'''
@@ -38,6 +41,7 @@ class MessengerException(Exception):
     def __str__(self):
         return repr(self.value)
 
+MessagePacket = collections.namedtuple('MessagePacket', ('topic','category','bus','device','value','data','timestamp'))
 
 class Messenger():
     '''Messenger provides an abstraction layer for a pub/sub message bus.  Clients work with messenger directly, and
@@ -48,8 +52,13 @@ class Messenger():
     TOPIC_SYSTEM_CONTROL = 'system.control'
     TOPIC_COMPONENT_STATUS = 'component.status'
     TOPIC_COMPONENT_HEARTBEAT = 'component.heartbeat'
+    TOPIC_SENSOR_DATA = 'component.sensor.data'
 
-    # implementations look for: def messengerCallback(self, topic, message):
+    MESSAGE_CATEGORY = Enum('Panic','Alert','Update','Command')
+
+    @classmethod
+    def buildPacket(self, msgtopic=TOPIC_SENSOR_DATA, msgcategory=MESSAGE_CATEGORY.Update, msgbus=None, msgdevice=None, msgvalue=None, msgdata=None):
+        return MessagePacket(topic=msgtopic, category=msgcategory, bus=msgbus, device=msgdevice, value=msgvalue, data=msgdata, timestamp=time.time() )
 
     @abstractmethod
     def publish(self, sender, topic, message):
@@ -82,5 +91,4 @@ class Messenger():
     def removeSubscriber(self, subscriber):
         '''Remove a subscriber from all topics'''
         pass
-
 
