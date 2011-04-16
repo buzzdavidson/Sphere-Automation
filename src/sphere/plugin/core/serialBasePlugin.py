@@ -41,12 +41,12 @@ class SerialBasePlugin(Plugin):
     '''Starting point for plugins which communicate with a serial port (or a device on a USB/Serial adapter).
     Interaction with serial port occurs on a managed background thread and received messages are passed back to
     plugin via a callback method.  Background thread lifecycle is managed by base class(es).'''
-    def __init__(self, name, device=None):
+    def __init__(self, name):
         Plugin.__init__(self, name)
-        self._device = device
+        self._device = None
         self._serialPort = None
         self._serialParams = {
-            'port' : self._device,
+#            'port' : self._device,
             'baudrate' : 9600,
             'bytesize': 8,
             'parity': 'N',
@@ -118,8 +118,7 @@ class SerialBasePlugin(Plugin):
         return BasicSerialHandler(self._serialPort, self._log, self._deviceCallback, self._messageLength)
 
     def _deviceCallback(self, message):
-        pass
-
+        raise SerialPluginException('Unhandled device callback')
 
 class BasicSerialHandler:
     '''Simple serial port handler implementation, listens for data and passes received data back via callback method.
@@ -137,12 +136,17 @@ class BasicSerialHandler:
                 message = self._readFromDevice()
                 if message is not None:
                     self._log.debug('Got %d bytes from device: %s', len(message), str(message).encode('hex'))
-                    self._messageCallback(message)
+                    message = self._messageHook(message)
+                    if message is not None:
+                        self._messageCallback(message)
             else:
                 self._log.debug('Serial handler thread is stopping.')
         except Exception as ex:
             raise SerialPluginException(ex)
 
+    def _messageHook(self, message):
+        '''In-stream callback hook for subclasses to perform intermediate processing or transforms on inbound messages'''
+        return message
 
     def _readFromDevice(self):
         message = bytearray('')
