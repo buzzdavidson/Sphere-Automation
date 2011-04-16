@@ -30,9 +30,11 @@ along with this program.  If not, see U{http://www.gnu.org/licenses/}.
 import logging
 import threading
 from time import time
+import controller
 from sphere.service.configManager import ConfigManager
-from sphere.service.controllable import Controllable
+from sphere.service.controllable import Controllable, startComponent
 from sphere.service.deviceRegistry import DeviceRegistry
+from sphere.service.deviceManager import DeviceManager
 from sphere.service.messenger import Messenger
 from sphere.service.messenger.simpleMessenger import SimpleMessenger
 from sphere.service.pluginManager import PluginManager
@@ -43,13 +45,14 @@ class SphereCoordinator(Controllable):
     (startup, shutdown, etc), Coordination between application components
     '''
     def __init__(self):
-        '''Global State Variables - key=varname, value=string'''
         Controllable.__init__(self, 'Coordinator')
+        self._components = list()
         MessengerFactory._messenger = SimpleMessenger() # TODO: configure this properly (directly in plumberjack)
-        self._globalState=dict()
-        self._configManager = ConfigManager()
-        self._pluginManager = PluginManager(self._configManager)
-        self._deviceRegistry = DeviceRegistry(self._configManager)
+        configManager = ConfigManager()
+        self._components.append(configManager)
+        self._components.append(PluginManager(configManager))
+        self._components.append(DeviceManager(configManager))
+        self._loopInterval = 1
 
     runLoopInterval = property(lambda self: self._loopInterval)
 
@@ -57,11 +60,27 @@ class SphereCoordinator(Controllable):
         pass
 
     def _doStart(self):
-        self._configManager.start()
-        self._deviceRegistry.start()
-        self._pluginManager.start()
-        return self._pluginManager.status == Controllable.STATUS.Started
+        startcount = 0
+        for component in self._components:
+            startComponent(component)
+            if component.status == Controllable.STATUS.Started:
+                startcount += 1
+        retval = (startcount == len(self._components))
+        self._log.debug('Started %d of %d registered components [%s]', startcount, len(self._components), retval)
+        return retval
 
     def _doStop(self):
-        # TODO: stop all children
-        pass
+        stopcount = 0
+        for component in reversed(self._components):
+            startComponent(component)
+            if component.status == Controllable.STATUS.Stopped:
+                stopcount += 1
+        retval = (stopcount == len(self._components))
+        self._log.debug('Stopped %d of %d registered components [%s]', stopcount, len(self._components), retval)
+        return retval
+
+    def run(self):
+        while(True):
+            for component in self._components:
+                component.refresh()
+            time.sleep(self._loopInterval)
