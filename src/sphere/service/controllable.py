@@ -99,6 +99,11 @@ class Controllable:
           Implementing classes should throw ControllableException on error.'''
         pass
 
+    @abstractmethod
+    def _doRefresh(self):
+        '''Perform component interval-based processing (if applicable)'''
+        pass
+
     def stop(self):
         '''Perform actual stop, wraps call to _doStop.  This method takes care of setting the self._stop event.
         There is little benefit to overriding this method.'''
@@ -121,7 +126,22 @@ class Controllable:
                 self._setStatus(Controllable.STATUS.Error)
                 self._log.error("Exception at stop: %s", ex)
 
+    def refresh(self):
+        if self._status == Controllable.STATUS.Started:
+            self._log.debug("[%s] Executing refresh loop", self._name)
+            self._doRefresh()
+
     def _setStatus(self, status):
         if status <> self._status:
             self._status = status
             self._messenger.publish(self, Messenger.TOPIC_COMPONENT_STATUS, status)
+
+def startComponent(controllable):
+    controllable.start()
+    # TODO delay loop/ return once started
+
+
+def stopComponent(controllable):
+    controllable.stop()
+    # TODO delay loop/ return once stopped
+
